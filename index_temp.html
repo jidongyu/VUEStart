@@ -1,0 +1,107 @@
+<!--
+ * @Description: 
+ * @Author: jidongyu
+ * @Date: 2020-11-26 11:19:54
+ * @LastEditTime: 2020-11-26 14:53:13
+ * @LastEditors: jidongyu
+ * @Reference: 
+-->
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>hello vue</title>
+    <script src="./vue.js"></script>
+    <style>
+        .isActived {
+            background-color: #dddddd;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <!-- <h1>{{title}}</h1>
+        <h2 v-once>{{message}}</h2>
+        <p v-html="rawHtml"></p>
+        <p v-bind:title="titleBind">属性值绑定</p>
+        <button v-bind:disabled="buttonDisabled"></button>
+        <input v-model="course" type="text" v-on:keydown.enter="addCourse" />
+        <button @click="addCourse">添加</button>
+        <p v-if="!courses.length">没有数据</p>
+        <div class="coursesList" v-else>
+            <ul v-for="c in courses" :key="c.id"> -->
+        <!-- 绑定Class的动态样式方法 -->
+        <!-- <li v-bind:class="{isActived: activeName === c.name}" @click="activeName=c.name">{{c.name}}</li> -->
+        <!-- 绑定内联style的样式方法 -->
+        <!-- <li :style="{'background-color': activeName === c.name ? '#dddddd' : 'transparent'}"
+                    @click="activeName=c.name">{{c.name}}
+                    <button @click="removeCourse(c.id)">删除</button>
+                </li>
+            </ul>
+        </div> -->
+
+    </div>
+    <script>
+        let app = new Vue({
+            el: '#app',
+            data() {
+                return {
+                    title: 'hello Vue',
+                    message: '一个不会变的值（不能再被改变的值）',
+                    rawHtml: `<span style="color:red">这里是红色</span>`,
+                    titleBind: '这里是个title绑定',
+                    buttonDisabled: false,
+                    courses: [{ id: 0, name: 'web全栈' }, { id: 1, name: 'web高级' }],
+                    course: '',
+                    activeName: '',
+                }
+            },
+            methods: {
+                addCourse: function () {
+                    let id = this.courses.length;
+                    this.courses.push({
+                        id,
+                        name: this.course
+                    });
+                    this.course = '';
+                },
+                removeCourse: function (id) {
+                    let targetIndex = null;
+                    targetIndex = this.courses.findIndex((item, index) => {
+                        return item.id === id
+                    });
+                    if (targetIndex || targetIndex === 0) {
+                        this.courses.splice(targetIndex, 1);
+                        this.courses = this.courses.map((item, i) => {
+                            if (i >= targetIndex) {
+                                return {
+                                    id: item.id + 1,
+                                    name: item.name
+                                }
+                            }
+                            return {
+                                id: item.id,
+                                name: item.name
+                            }
+                        })
+                    }
+                },
+            },
+            render() {
+                with(this){
+                    return _c('div',{attrs:{"id":"app"}},[_c('h2',{attrs: {"title":title}},[_v("\n "+_s(title)+"\n ")]),_v(" "),_c('input',{directives:[{name:"model",rawName:"v-model",value: (course),expression:"course"}],attrs:{"type":"text"},domProps:{"value": (course)},on:{"keydown":function($event) {if(!$event.type.indexOf('key')&&_k($event.keyCode,"enter",13,$event.key,"Enter" ))return null;return addCourse($event)},"input":function($event) {if($event.target.composing)return;course=$event.target.value}}}),_v(" "),_c('button',{on:{"click":addCourse}},[_v("新增课程")]),_v(" "),(courses.length == 0)?_c('p',[_v("没有任何课程信息")]):_e(),_v(" "),_c('ul',_l((courses),function(c){return _c('li',{class:{active: (selectedCourse === c)},on:{"click":function($event){selectedCourse = c}}}, [_v(_s(c))])}),0)])
+                }
+            },
+        })
+        setTimeout(() => {
+            app.title = 'mua~,hello Vue';
+            app.message = '我就试试看还能改变不';
+            app.titleBind = '这里是2s后的title绑定';
+            app.buttonDisabled = true;
+        }, 2000);
+    </script>
+</body>
+
+</html>

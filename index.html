@@ -1,0 +1,128 @@
+<!--
+ * @Description: 
+ * @Author: jidongyu
+ * @Date: 2020-11-23 22:08:01
+ * @LastEditTime: 2020-11-26 19:15:16
+ * @LastEditors: jidongyu
+ * @Reference: 
+-->
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>hello vue</title>
+    <script src="./vue.js"></script>
+    <style>
+        .isActived {
+            background-color: #dddddd;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <h1>{{title}}</h1>
+        <h2 v-once>{{message}}</h2>
+        <p v-html="rawHtml"></p>
+        <p v-bind:title="titleBind">属性值绑定</p>
+        <button v-bind:disabled="buttonDisabled"></button>
+        <input v-model="course" type="text" v-on:keydown.enter="addCourse" />
+        <button @click="addCourse">添加</button>
+        <p v-if="!courses.length">没有数据</p>
+        <div class="coursesList" v-else>
+            <ul v-for="c in courses" :key="c.id">
+                <!-- 绑定Class的动态样式方法 -->
+                <!-- <li v-bind:class="{isActived: activeName === c.name}" @click="activeName=c.name">{{c.name}}</li> -->
+                <!-- 绑定内联style的样式方法 -->
+                <li :style="{'background-color': activeName === c.name ? '#dddddd' : 'transparent'}"
+                    @click="activeName=c.name">{{c.name}}
+                    <button @click="removeCourse(c.id)">删除</button>
+                </li>
+            </ul>
+        </div>
+        <p>总共{{totalCourses}}条数据</p>
+
+    </div>
+    <script>
+        let app = new Vue({
+            el: '#app',
+            data() {
+                return {
+                    title: 'hello Vue',
+                    message: '一个不会变的值（不能再被改变的值）',
+                    rawHtml: `<span style="color:red">这里是红色</span>`,
+                    titleBind: '这里是个title绑定',
+                    buttonDisabled: false,
+                    courses: [{ id: 0, name: 'web全栈' }, { id: 1, name: 'web高级' }],
+                    course: '',
+                    activeName: '',
+                    totalCourses: 0,
+                }
+            },
+            methods: {
+                addCourse: function () {
+                    let id = this.courses.length;
+                    this.courses.push({
+                        id,
+                        name: this.course
+                    });
+                    this.course = '';
+                },
+                removeCourse: function (id) {
+                    let targetIndex = null;
+                    targetIndex = this.courses.findIndex((item, index) => {
+                        return item.id === id
+                    });
+                    if (targetIndex || targetIndex===0) {
+                        this.courses.splice(targetIndex, 1);
+                        this.courses = this.courses.map((item, i) => {
+                            if (i >= targetIndex) {
+                                return {
+                                    id: item.id + 1,
+                                    name: item.name
+                                }
+                            }
+                            return {
+                                id: item.id,
+                                name: item.name
+                            }
+                        })
+                    }
+                }
+            },
+            // computed有缓存，当再次执行render渲染函数进行运算时，如果computed中的函数依赖变化值（如下头的this.courses）没有变化，
+            // 那么相应的computed属性是不会进行计算的,直接返回上次计算好的数据，当依赖数据发生变化时才进行计算。
+            // 而methods里的方法，是每次render重新渲染时，都会进行重新计算
+            computed: {
+                total: function(){
+                    return this.courses.length
+                }
+            },
+            // 默认的watch操作在页面/组件初始加载时是不会进行运算的
+            // watch: {
+            //     courses(newValue, oldValue) {
+            //         this.totalCourses = newValue.length
+            //     }
+            // },
+            watch: {
+                courses: {
+                    immediate: true, // 是否初始时就进行计算()
+                    deep: false, // 当数据时多重复杂数据时（如: [{id:1,name:'ji',children:{id:11,name:'xx'}},{id:2,name:'dong',children:{id:21,name:'xx'}}]），是否需要循环遍历
+                    handler(newValue, oldValue) {
+                        this.totalCourses = newValue.length
+                    }
+                }
+            },
+        })
+        setTimeout(() => {
+            app.title = 'mua~,hello Vue';
+            app.message = '我就试试看还能改变不';
+            app.titleBind = '这里是2s后的title绑定';
+            app.buttonDisabled = true;
+        }, 2000);
+    </script>
+</body>
+
+</html>
