@@ -1,10 +1,10 @@
 <!--
- * @Description: 
+ * @Descripttion: 
+ * @version: 
  * @Author: jidongyu
- * @Date: 2020-11-23 22:08:01
- * @LastEditTime: 2020-12-31 01:16:58
+ * @Date: 2020-12-26 17:14:46
  * @LastEditors: jidongyu
- * @Reference: 
+ * @LastEditTime: 2020-12-27 01:07:01
 -->
 
 <html lang="en">
@@ -21,16 +21,8 @@
         
         .message-box {
             padding: 10px 20px;
-        }
-        
-        .success {
             background: #4fc08d;
             border: 1px solid #42b983;
-        }
-        
-        .warning {
-            background: #f66;
-            border: 1px solid #d63200;
         }
         
         .message-box-close {
@@ -41,28 +33,18 @@
 
 <body>
     <div id="app">
-        <heading level="1" :title="title">{{title}}</heading>
-        <h1 :title="title">{{title}}</h1>
+        <h1>{{title}}</h1>
         <h2 v-once>{{message}}</h2>
         <p v-html="rawHtml"></p>
         <p v-bind:title="titleBind">属性值绑定</p>
         <button v-bind:disabled="buttonDisabled"></button>
-        <message :show.sync="isShow" class="success">
+        <message :show.sync="isShow">
             <template v-slot:title="slotPorps">
                 <strong>{{slotPorps.title}}</strong>
             </template>
             <template v-slot:default>测试而已</template>
         </message>
-        <message :show.sync="isShowWarn" class="warning">
-            <template v-slot:title>
-                <strong>警公：</strong>
-            </template>
-            <template v-slot:default>不能为空</template>
-        </message>
-        <div>
-            <button @click="$bus.$emit('message-close')" v-permission="'user'">批量关闭</button>
-        </div>
-        <input v-model.number="price" v-focus/> <button @click="batchUpdate">统一加价</button>
+        <input v-model.number="price" /> <button @click="batchUpdate">统一加价</button>
         <course-add v-model="course" @add-course="addCourse"></course-add>
 
         <course-list :courses1="courses" @remove-course="removeCourse"></course-list>
@@ -71,44 +53,6 @@
 
     </div>
     <script>
-        Vue.prototype.$bus = new Vue();
-        Vue.component('heading', {
-            props: {
-                level: {
-                    type: String,
-                    required: true
-                }
-            },
-            // render(createElement)的参数是个createElement函数，该createElement函数返回的是一个新建的VNode虚拟dome；
-            // createElement(target,props,child)接受三个参数——目标元素标签、绑定的属性（如:v-bind:title="title1"）对象、包含孩子节点数组
-            // 这其中第2个参数，如果没有设置，那么vue会默认的将自定义组件上的绑定属性添加到第二个参数上
-            render(h) {
-                console.log(this.$slots.default, 'this.$slots.default');
-                return h(
-                    'h' + this.level, {
-                        attrs: {
-                            title: this.title
-                        }
-                    },
-                    this.$slots.default
-                );
-            },
-        })
-        Vue.directive('focus', {
-            inserted(el) {
-                el.focus();
-            }
-        });
-
-        Vue.directive('permission', {
-            inserted(el, binding, vnode) {
-                console.log(binding, '------binding-------');
-                if (binding.value !== 'admin') {
-                    el.parentElement.removeChild(el);
-                }
-            }
-        });
-
         function getResouce() {
             return new Promise(resolve => {
                 setTimeout(() => {
@@ -134,12 +78,6 @@
                     <span class="message-box-close" @click="$emit('update:show',false)">X</span>
                 </div>
             `,
-            mounted() {
-                // 绑定监听事件
-                this.$bus.$on('message-close', () => {
-                    this.$emit('update:show', false)
-                })
-            },
         })
         Vue.component('course-add', {
 
@@ -182,18 +120,13 @@
                            <!-- <li v-bind:class="{isActived: activeName === c.name}" @click="activeName=c.name">{{c.name}}</li> -->
                            <!-- 绑定内联style的样式方法 -->
                            <li :style="{'background-color': activeName === c.name ? '#dddddd' : 'transparent'}"
-                               @click="activeName=c.name">{{c.name}}-{{c.price || 0 | current}}
+                               @click="activeName=c.name">{{c.name}}-￥{{c.price || 0}}
                                <button @click="removeCourse(c.id)">删除</button>
                            </li>
                         </ul>
                     </div>
                 </div>
             `,
-            filters: {
-                current(value, unit = '￥') {
-                    return `${unit}-${value}`
-                }
-            },
             methods: {
                 removeCourse: function(id) {
                     this.$emit('remove-course', id);
@@ -209,18 +142,19 @@
                     rawHtml: `<span style="color:red">这里是红色</span>`,
                     titleBind: '这里是个title绑定',
                     buttonDisabled: false,
-                    courses: [{
-                        id: 0,
-                        name: 'web全栈'
-                    }, {
-                        id: 1,
-                        name: 'web高级'
-                    }],
+                    courses: [
+                        // {
+                        //     id: 0,
+                        //     name: 'web全栈'
+                        // }, {
+                        //     id: 1,
+                        //     name: 'web高级'
+                        // }
+                    ],
                     course: '',
                     activeName: '',
                     totalCourses: 0,
                     isShow: false,
-                    isShowWarn: false,
                     price: 0,
                 }
             },
@@ -238,18 +172,13 @@
                     });
                 },
                 addCourse: function() {
-                    if (this.course) {
-                        let id = this.courses.length;
-                        this.courses.push({
-                            id,
-                            name: this.course,
-                            price: 0
-                        });
-                        this.course = '';
-                        this.isShow = true;
-                    } else {
-                        this.isShowWarn = true;
-                    }
+                    let id = this.courses.length;
+                    this.courses.push({
+                        id,
+                        name: this.course
+                    });
+                    this.course = '';
+                    this.isShow = true;
                 },
                 removeCourse: function(id) {
                     let targetIndex = null;
